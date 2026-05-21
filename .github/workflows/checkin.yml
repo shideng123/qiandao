@@ -2,21 +2,26 @@ name: MindVideo 每日自动签到
 
 on:
   schedule:
-    - cron: "0 0 * * *"  # 每天 UTC 0点（北京时间 8点）
-  workflow_dispatch:     # 允许手动触发
+    - cron: "0 0 * * *"  # 每天 UTC 0点（北京时间 8:00）
+  workflow_dispatch:     # 允许手动触发运行
 
 jobs:
   checkin:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # 消除 Node.js 20 弃用警告
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
+
+      - name: 配置 Python 环境
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-      - name: Run checkin
+
+      - name: 安装依赖
+        run: pip install requests
+
+      - name: 执行签到
         env:
           MINDVIDEO_TOKEN: ${{ secrets.MINDVIDEO_TOKEN }}
         run: python main.py
